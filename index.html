@@ -221,7 +221,7 @@ function recalc() {
   document.getElementById('pOut').textContent = P.toFixed(1) + ' Вт';
   document.getElementById('eOut').textContent = (P / 1000).toFixed(3) + ' кВт·ч';
   document.getElementById('warn').textContent =
-    I > 5 ? '⚠ Большой ток! Предохранитель в реальной цепи сработал бы.' : '';
+    I > 5 ? '⚠ ЧОН ТОК! Чыныгы электр чынжыры болсо сактагыч иштеп кетмек.' : '';
   swBtn.textContent = closed ? 'Разомкнуть цепь' : 'Замкнуть цепь';
   swBtn.className = closed ? '' : 'off';
   leverTarget = closed ? 0 : 0.95;
