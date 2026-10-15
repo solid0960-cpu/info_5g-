@@ -1,260 +1,273 @@
 <!DOCTYPE html>
-<html lang="ky">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Химиялык элементтердин 3D симуляциясы</title>
+<title>Электр тогунун 3д модели</title>
 <style>
-:root{--bg:#0e1a24;--panel:#16283a;--line:#2b435a;--text:#eaf2f8;--muted:#9db3c6;--accent:#4fd1a5}
-*{box-sizing:border-box}
-[hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--text);font-family:"Trebuchet MS",Verdana,sans-serif;height:100vh;display:flex;flex-direction:column}
-header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line)}
-h1{margin:0;font-size:1.15rem}
-button{font:inherit;color:var(--text);cursor:pointer}
-button:focus-visible{outline:2px solid var(--accent)}
-.tabs button{background:var(--panel);border:1px solid var(--line);padding:7px 14px;border-radius:8px;margin-left:6px}
-.tabs button.on{border-color:var(--accent);background:#1d4a44}
-section{flex:1;min-height:0}
-#sim{display:flex;flex-direction:column;overflow-y:auto}
-.top{flex:none;height:max(460px,66vh);display:grid;grid-template-columns:1fr 330px}
-.stage{position:relative;min-height:0}
-#stage{width:100%;height:100%;display:block;cursor:grab}
-.legend{position:absolute;left:10px;top:10px;background:rgba(22,40,58,.75);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.72rem;pointer-events:none}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
-.ctrl{position:absolute;left:10px;bottom:10px;background:rgba(22,40,58,.9);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:.8rem}
-.ctrl input{vertical-align:middle;width:110px}
-#info{padding:14px;border-left:1px solid var(--line);background:var(--panel);overflow:auto}
-.head{display:flex;gap:12px;align-items:center;margin-bottom:10px}
-#big{width:74px;height:74px;border-radius:10px;border:2px solid;display:grid;place-items:center;font-size:2rem;font-weight:bold}
-#nm{font-size:1.4rem;font-weight:bold}
-#info table{width:100%;border-collapse:collapse;font-size:.9rem}
-#info td{padding:4px 0;border-bottom:1px solid var(--line)}
-#info td:last-child{text-align:right;font-weight:bold}
-#bio{color:var(--muted);font-size:.85rem;line-height:1.4;margin:10px 0}
-.nav{display:flex;gap:6px}
-.nav button{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 4px}
-.nav button:hover{border-color:var(--accent)}
-.tw{flex:none;overflow:auto;border-top:1px solid var(--line);padding:8px;background:var(--panel)}
-#pt{display:grid;grid-template-columns:repeat(18,minmax(34px,1fr));grid-template-rows:repeat(7,auto) 8px repeat(2,auto);gap:3px;min-width:680px;max-width:1100px;margin:auto}
-#pt button{background:var(--bg);border:1px solid;border-radius:5px;padding:2px 0;line-height:1.1}
-#pt button small{display:block;font-size:.55rem;color:var(--muted)}
-#pt button b{font-size:.85rem}
-#pt button.on{background:#fff2;box-shadow:0 0 0 2px #fff}
-#quiz{overflow:auto;padding:20px;display:flex;justify-content:center}
-.qbox{max-width:620px;width:100%}
-.qbox h2{font-size:1.25rem;margin:8px 0 16px}
-.opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;margin:8px 0;font-size:1rem}
-.opt:not(:disabled):hover{border-color:var(--accent)}
-.opt.ok{background:#1d5a3f;border-color:#4fd1a5}
-.opt.bad{background:#6a2a33;border-color:#ff6b6b}
-.exp{background:var(--panel);border-left:4px solid var(--accent);padding:10px 12px;margin:12px 0;border-radius:6px;font-size:.9rem;line-height:1.4}
-.btn{background:var(--accent);color:#06251d;border:0;border-radius:8px;padding:10px 18px;font-weight:bold}
-.muted{color:var(--muted);font-size:.9rem}
-@media(max-width:800px){body{height:auto;min-height:100vh}#sim{overflow:visible}.top{height:auto;grid-template-columns:1fr;grid-template-rows:55vh auto}#info{border-left:0;border-top:1px solid var(--line)}}
+  :root { --bg:#0b1220; --card:rgba(30,41,59,.92); --text:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8; --warn:#f87171; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text);
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #view { position:fixed; inset:0; }
+  .panel { position:fixed; left:12px; bottom:12px; right:12px; max-width:420px; background:var(--card);
+    border-radius:14px; padding:14px; backdrop-filter: blur(6px); }
+  .title { position:fixed; top:12px; left:14px; right:14px; pointer-events:none; }
+  .title h1 { margin:0; font-size:1.15rem; }
+  .title p { margin:2px 0 0; color:var(--muted); font-size:.85rem; }
+  label { display:flex; justify-content:space-between; font-size:.9rem; margin:8px 0 4px; }
+  label b { color:var(--accent); }
+  input[type=range] { width:100%; accent-color:var(--accent); }
+  .row { display:flex; gap:8px; align-items:center; margin-top:10px; }
+  button { background:var(--accent); color:#0b1220; border:0; border-radius:10px; padding:9px 14px;
+    font-size:.95rem; font-weight:600; cursor:pointer; }
+  button.off { background:#475569; color:#e2e8f0; }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; text-align:center; }
+  .stat { background:#0b1220; border-radius:10px; padding:8px 2px; }
+  .stat span { display:block; color:var(--muted); font-size:.72rem; }
+  .stat strong { font-size:1.05rem; }
+  #warn { color:var(--warn); font-size:.85rem; font-weight:600; min-height:1.2em; margin-top:8px; }
 </style>
 </head>
 <body>
-<header>
-  <h1>Химиялык элементтердин 3D симуляциясы</h1>
-  <div class="tabs"><button id="t1" class="on">Симуляция</button><button id="t2">Тест</button></div>
-</header>
+<div id="view"></div>
 
-<section id="sim">
-  <div class="top">
-    <div class="stage">
-      <canvas id="stage"></canvas>
-      <div class="legend">
-        <div><i style="background:#ff6b6b"></i>Протон (+)</div>
-        <div><i style="background:#b8c4cf"></i>Нейтрон (0)</div>
-        <div><i style="background:#5cc8ff"></i>Электрон (−)</div>
-        <div><i style="background:#ffb84d"></i>Сырткы кабыктагы электрон</div>
-      </div>
-      <div class="ctrl"><label>Ылдамдык <input id="spd" type="range" min="0" max="3" step="0.1" value="1"></label></div>
-    </div>
-    <div id="info">
-      <div class="head"><div id="big"></div><div id="nm"></div></div>
-      <table>
-        <tr><td>Атомдук номери</td><td id="z"></td></tr>
-        <tr><td>Массалык саны</td><td id="a"></td></tr>
-        <tr><td>Протон</td><td id="pr"></td></tr>
-        <tr><td>Нейтрон</td><td id="ne"></td></tr>
-        <tr><td>Электрон</td><td id="el"></td></tr>
-        <tr><td>Электрон кабыктары</td><td id="sh"></td></tr>
-        <tr><td>Сырткы кабыктагы электрон</td><td id="va"></td></tr>
-        <tr><td>Тобу</td><td id="gr"></td></tr>
-      </table>
-      <p id="bio"></p>
-      <div class="nav"><button id="pv">◀ Мурунку</button><button id="nx">Кийинки ▶</button><button id="rd">Кокус</button></div>
-      <p class="muted">Чычкан менен буруңуз, дөңгөлөкчө менен жакындатыңыз. Клавиатурада ← → баскычтары да иштейт.</p>
-    </div>
+<div class="title">
+  <h1>⚡ ЭЛЕКТО ТОГУНУН 3Д МОДЕЛИ </h1>
+  <p>айландырып жакындатып жана параметирин алмаштырсанар болот</p>
+</div>
+
+<div class="panel">
+  <label>чыналуусу U <b id="uVal">12 В</b></label>
+  <input type="range" id="u" min="1" max="24" step="1" value="12">
+  <label>жарыктагы каршылык R <b id="rVal">24 Ом</b></label>
+  <input type="range" id="r" min="1" max="100" step="1" value="24">
+<div class="row"><button id="sw">чынжырын ажыратуу</button></div>
+  <div class="stats">
+    <div class="stat"><span>Ток I</span><strong id="iOut">0.50 А</strong></div>
+    <div class="stat"><span>Кубаттуулук P</span><strong id="pOut">6.0 Вт</strong></div>
+    <div class="stat"><span>Энергия/саат</span><strong id="eOut">0.006 кВт·ч</strong></div>
   </div>
-  <div class="tw"><div id="pt"></div></div>
-</section>
+  <div id="warn"></div>
+</div>
 
-<section id="quiz" hidden><div class="qbox" id="qb"></div></section>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-const RAW="H Суутек 1,He Гелий 4,Li Литий 7,Be Бериллий 9,B Бор 11,C Көмүртек 12,N Азот 14,O Кычкылтек 16,F Фтор 19,Ne Неон 20,Na Натрий 23,Mg Магний 24,Al Алюминий 27,Si Кремний 28,P Фосфор 31,S Күкүрт 32,Cl Хлор 35,Ar Аргон 40,K Калий 39,Ca Кальций 40,Sc Скандий 45,Ti Титан 48,V Ванадий 51,Cr Хром 52,Mn Марганец 55,Fe Темир 56,Co Кобальт 59,Ni Никель 59,Cu Жез 64,Zn Цинк 65,Ga Галлий 70,Ge Германий 73,As Мышьяк 75,Se Селен 79,Br Бром 80,Kr Криптон 84,Rb Рубидий 85,Sr Стронций 88,Y Иттрий 89,Zr Цирконий 91,Nb Ниобий 93,Mo Молибден 96,Tc Технеций 98,Ru Рутений 101,Rh Родий 103,Pd Палладий 106,Ag Күмүш 108,Cd Кадмий 112,In Индий 115,Sn Калай 119,Sb Сурьма 122,Te Теллур 128,I Йод 127,Xe Ксенон 131,Cs Цезий 133,Ba Барий 137,La Лантан 139,Ce Церий 140,Pr Празеодим 141,Nd Неодим 144,Pm Прометий 145,Sm Самарий 150,Eu Европий 152,Gd Гадолиний 157,Tb Тербий 159,Dy Диспрозий 163,Ho Гольмий 165,Er Эрбий 167,Tm Тулий 169,Yb Иттербий 173,Lu Лютеций 175,Hf Гафний 178,Ta Тантал 181,W Вольфрам 184,Re Рений 186,Os Осмий 190,Ir Иридий 192,Pt Платина 195,Au Алтын 197,Hg Сымап 201,Tl Таллий 204,Pb Коргошун 207,Bi Висмут 209,Po Полоний 209,At Астат 210,Rn Радон 222,Fr Франций 223,Ra Радий 226,Ac Актиний 227,Th Торий 232,Pa Протактиний 231,U Уран 238,Np Нептуний 237,Pu Плутоний 244,Am Америций 243,Cm Кюрий 247,Bk Берклий 247,Cf Калифорний 251,Es Эйнштейний 252,Fm Фермий 257,Md Менделевий 258,No Нобелий 259,Lr Лоуренсий 262,Rf Резерфордий 267,Db Дубний 268,Sg Сиборгий 271,Bh Борий 272,Hs Хассий 270,Mt Мейтнерий 276,Ds Дармштадтий 281,Rg Рентгений 280,Cn Коперниций 285,Nh Нихоний 284,Fl Флеровий 289,Mc Московий 288,Lv Ливерморий 293,Ts Теннессин 294,Og Оганесон 294";
-const EL=RAW.split(",").map(s=>{const[a,b,c]=s.split(" ");return{s:a,n:b,m:+c}});
-const CAT=[["Металл эместер","#4fd1a5"],["Асыл газдар","#b28dff"],["Щелочтуу металлдар","#ff8a65"],["Щелочтуу-жер металлдары","#ffc857"],["Жарым металлдар","#7fd6c2"],["Галогендер","#f78fb3"],["Өткөөл металлдар","#5cc8ff"],["Лантаноиддер","#8fa8ff"],["Актиноиддер","#c792ea"],["Башка металлдар","#9db3c6"]];
-function cat(z){
-  if([2,10,18,36,54,86,118].includes(z))return 1;
-  if([3,11,19,37,55,87].includes(z))return 2;
-  if([4,12,20,38,56,88].includes(z))return 3;
-  if([5,14,32,33,51,52].includes(z))return 4;
-  if([9,17,35,53,85,117].includes(z))return 5;
-  if([1,6,7,8,15,16,34].includes(z))return 0;
-  if(z>=57&&z<=71)return 7; if(z>=89&&z<=103)return 8;
-  if((z>=21&&z<=30)||(z>=39&&z<=48)||(z>=72&&z<=80)||(z>=104&&z<=112))return 6;
-  return 9;
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ---------- Сцена ----------
+const container = document.getElementById('view');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b1220);
+scene.fog = new THREE.Fog(0x0b1220, 14, 32);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 8, 11);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+container.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.maxPolarAngle = Math.PI * 0.49;
+controls.minDistance = 5;
+controls.maxDistance = 22;
+controls.target.set(0, 0.5, 0);
+
+// Свет
+scene.add(new THREE.AmbientLight(0x8fa3c4, 0.55));
+const sun = new THREE.DirectionalLight(0xffffff, 1.0);
+sun.position.set(6, 12, 8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.left = -10; sun.shadow.camera.right = 10;
+sun.shadow.camera.top = 10; sun.shadow.camera.bottom = -10;
+scene.add(sun);
+
+// Плата-основание
+const board = new THREE.Mesh(
+  new THREE.BoxGeometry(11, 0.4, 7.5),
+  new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.7, metalness: 0.1 })
+);
+board.position.y = -0.2;
+board.receiveShadow = true;
+scene.add(board);
+scene.add(new THREE.GridHelper(40, 40, 0x1e293b, 0x1e293b)).position.y = -0.41;
+
+// ---------- Путь провода ----------
+const X = 4, Z = 2.5, Y = 0.5;
+const pts = [];
+const step = 0.25;
+for (let x = -X; x < X; x += step) pts.push(new THREE.Vector3(x, Y, -Z));
+for (let z = -Z; z < Z; z += step) pts.push(new THREE.Vector3(X, Y, z));
+for (let x = X; x > -X; x -= step) pts.push(new THREE.Vector3(x, Y, Z));
+for (let z = Z; z > -Z; z -= step) pts.push(new THREE.Vector3(-X, Y, z));
+const curve = new THREE.CatmullRomCurve3(pts, true, 'centripetal');
+
+const wire = new THREE.Mesh(
+  new THREE.TubeGeometry(curve, 400, 0.09, 10, true),
+  new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.35, metalness: 0.85 })
+);
+wire.castShadow = true;
+scene.add(wire);
+
+// ---------- Батарея (слева) ----------
+const battery = new THREE.Group();
+const body = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.55, 0.55, 1.5, 32),
+  new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.4, metalness: 0.3 })
+);
+const capPlus = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.25, 0.25, 0.25, 24),
+  new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.7, roughness: 0.3 })
+);
+capPlus.position.y = 0.87;
+const capMinus = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.4, 0.4, 0.12, 24),
+  new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.3 })
+);
+capMinus.position.y = -0.81;
+battery.add(body, capPlus, capMinus);
+battery.rotation.x = Math.PI / 2;
+battery.position.set(-X, Y, 0);
+battery.traverse(o => { if (o.isMesh) o.castShadow = true; });
+scene.add(battery);
+
+// ---------- Лампа (справа) ----------
+const lampGroup = new THREE.Group();
+lampGroup.position.set(X, Y, 0);
+const lampBase = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.45, 0.55, 0.6, 24),
+  new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.8, roughness: 0.35 })
+);
+lampBase.position.y = -0.1;
+const glass = new THREE.Mesh(
+  new THREE.SphereGeometry(0.85, 32, 24),
+  new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.22,
+    roughness: 0.05, transmission: 0.6 })
+);
+glass.position.y = 0.95;
+const bulbMat = new THREE.MeshStandardMaterial({ color: 0x3b3b2a, emissive: 0xfde047, emissiveIntensity: 0 });
+const filament = new THREE.Mesh(new THREE.SphereGeometry(0.38, 24, 18), bulbMat);
+filament.position.y = 0.95;
+const lampLight = new THREE.PointLight(0xfde047, 0, 12, 1.6);
+lampLight.position.y = 1.1;
+lampGroup.add(lampBase, filament, glass, lampLight);
+scene.add(lampGroup);
+
+// ---------- Выключатель (спереди) ----------
+const swGroup = new THREE.Group();
+swGroup.position.set(0, Y, Z);
+const baseSw = new THREE.Mesh(
+  new THREE.BoxGeometry(2.2, 0.3, 0.9),
+  new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 })
+);
+baseSw.position.y = -0.1;
+const postMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.9, roughness: 0.25 });
+const postL = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.4, 16), postMat);
+const postR = postL.clone();
+postL.position.set(-0.8, 0.2, 0);
+postR.position.set(0.8, 0.2, 0);
+const leverPivot = new THREE.Group();
+leverPivot.position.set(-0.8, 0.42, 0);
+const lever = new THREE.Mesh(
+  new THREE.BoxGeometry(1.7, 0.1, 0.22),
+  new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.9, roughness: 0.2 })
+);
+lever.position.x = 0.85;
+const knob = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 12),
+  new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+knob.position.set(1.6, 0.12, 0);
+leverPivot.add(lever, knob);
+swGroup.add(baseSw, postL, postR, leverPivot);
+swGroup.traverse(o => { if (o.isMesh) o.castShadow = true; });
+scene.add(swGroup);
+
+// ---------- Заряды ----------
+const N = 90;
+const chargeMesh = new THREE.InstancedMesh(
+  new THREE.SphereGeometry(0.1, 10, 8),
+  new THREE.MeshBasicMaterial({ color: 0x38bdf8 }),
+  N
+);
+scene.add(chargeMesh);
+const phase = Array.from({ length: N }, (_, i) => i / N);
+const dummy = new THREE.Object3D();
+
+// ---------- Логика ----------
+const uEl = document.getElementById('u');
+const rEl = document.getElementById('r');
+const swBtn = document.getElementById('sw');
+let closed = true, U = 12, R = 24, I = 0, P = 0;
+let leverAngle = 0, leverTarget = 0;
+
+function recalc() {
+  U = +uEl.value; R = +rEl.value;
+  I = closed ? U / R : 0;
+  P = U * I;
+  document.getElementById('uVal').textContent = U + ' В';
+  document.getElementById('rVal').textContent = R + ' Ом';
+  document.getElementById('iOut').textContent = I.toFixed(2) + ' А';
+  document.getElementById('pOut').textContent = P.toFixed(1) + ' Вт';
+  document.getElementById('eOut').textContent = (P / 1000).toFixed(3) + ' кВт·ч';
+  document.getElementById('warn').textContent =
+    I > 5 ? '⚠ Большой ток! Предохранитель в реальной цепи сработал бы.' : '';
+  swBtn.textContent = closed ? 'Разомкнуть цепь' : 'Замкнуть цепь';
+  swBtn.className = closed ? '' : 'off';
+  leverTarget = closed ? 0 : 0.95;
 }
-const BIO={1:"Суунун жана органикалык заттардын курамында.",2:"Инерттүү газ, организмде роль ойнобойт.",5:"Өсүмдүктөрдүн өсүшү үчүн керек.",6:"Бардык органикалык заттардын негизи.",7:"Белоктордун жана ДНКнын курамында.",8:"Дем алуу үчүн зарыл, суунун курамында.",9:"Тиштин эмалын бекемдейт.",10:"Инерттүү газ, организмде роль ойнобойт.",11:"Нерв импульстарын жана суунун тең салмактуулугун жөнгө салат.",12:"Хлорофиллдин борборунда, фотосинтезге керек.",14:"Өсүмдүктөрдүн жана сөөктүн бекемдигине жардам берет.",15:"ДНК, РНК жана АТФтын курамында.",16:"Белоктордун (аминокислоталардын) курамында.",17:"Ашказан ширесинин курамында (HCl).",18:"Инерттүү газ, организмде роль ойнобойт.",19:"Клеткалардын жана нерв импульстарынын иштешинде.",20:"Сөөктөрдүн жана тиштердин негизги курамы.",26:"Гемоглобиндин курамында, кандагы кычкылтекти ташыйт.",27:"В12 витамининин курамында.",29:"Кээ бир ферменттердин курамында, аз өлчөмдө керек.",30:"Көптөгөн ферменттердин курамында, иммундук системага керек.",53:"Калкан безинин гормондорунун курамында.",80:"Уулуу, организмге зыяндуу.",82:"Уулуу, организмге зыяндуу.",92:"Радиоактивдүү, организмге зыяндуу."};
-const bio=z=>BIO[z]||"Тирүү организмдерде негизги ролу жок же өтө аз.";
+uEl.addEventListener('input', recalc);
+rEl.addEventListener('input', recalc);
+swBtn.addEventListener('click', () => { closed = !closed; recalc(); });
+recalc();
 
-// электрон кабыктары (Маделунг эрежеси, бир нече өзгөчөлүк менен)
-const SUB=[[1,0],[2,0],[2,1],[3,0],[3,1],[4,0],[3,2],[4,1],[5,0],[4,2],[5,1],[6,0],[4,3],[5,2],[6,1],[7,0],[5,3],[6,2],[7,1]];
-const EXC={24:[2,8,13,1],29:[2,8,18,1],46:[2,8,18,18],47:[2,8,18,18,1],79:[2,8,18,32,18,1]};
-function shells(z){
-  if(EXC[z])return EXC[z];
-  const r=[0,0,0,0,0,0,0,0];let left=z;
-  for(const[n,l]of SUB){if(left<=0)break;const k=Math.min(2*(2*l+1),left);r[n]+=k;left-=k}
-  return r.slice(1).filter(x=>x>0);
-}
+// ---------- Цикл ----------
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
 
-// ---------- 3D ----------
-const $=id=>document.getElementById(id);
-const canvas=$("stage");
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x0e1a24);
-const camera=new THREE.PerspectiveCamera(50,1,0.1,100);
-scene.add(new THREE.AmbientLight(0xffffff,.6));
-const light=new THREE.PointLight(0xffffff,1.2);light.position.set(8,8,12);scene.add(light);
-const gS=new THREE.SphereGeometry(1,12,12);
-const mP=new THREE.MeshPhongMaterial({color:0xff6b6b}),mN=new THREE.MeshPhongMaterial({color:0xb8c4cf});
-const mE=new THREE.MeshPhongMaterial({color:0x5cc8ff,emissive:0x1a5f80}),mV=new THREE.MeshPhongMaterial({color:0xffb84d,emissive:0x7a4a00});
-let atom=null,electrons=[],cur=0;
+  // рычаг
+  leverAngle += (leverTarget - leverAngle) * Math.min(1, dt * 10);
+  leverPivot.rotation.z = leverAngle;
 
-function build(i){
-  cur=i;
-  if(atom)scene.remove(atom);
-  electrons=[];atom=new THREE.Group();
-  const z=i+1,m=EL[i].m,n=m-z,R=0.2*Math.cbrt(m)+0.15,rs=Math.max(.12,.28-m/1100);
-  for(let k=0;k<m;k++){
-    const y=m===1?0:1-2*(k+.5)/m,rr=Math.sqrt(1-y*y),t=k*2.399963,d=R*Math.cbrt((k*0.618034)%1);
-    const isP=Math.floor((k+1)*z/m)>Math.floor(k*z/m);
-    const s=new THREE.Mesh(gS,isP?mP:mN);
-    s.scale.setScalar(rs);
-    s.position.set(Math.cos(t)*rr*d,y*d,Math.sin(t)*rr*d);
-    atom.add(s);
+  // лампа
+  const b = closed ? Math.min(1, Math.sqrt(P / 120)) : 0;
+  bulbMat.emissiveIntensity = b * 2.2;
+  lampLight.intensity = b * 60;
+
+  // заряды
+  if (closed) {
+    const speed = (0.01 + I * 0.012);
+    for (let i = 0; i < N; i++) phase[i] = (phase[i] + speed * dt * 4) % 1;
   }
-  const sh=shells(z);let maxR=0;
-  sh.forEach((cnt,si)=>{
-    const rad=R+1.7+si*1.0,g=new THREE.Group();maxR=rad;
-    g.rotation.set(si*0.7+0.3,si*0.5,si*0.9);
-    const pts=[];for(let a=0;a<=64;a++)pts.push(new THREE.Vector3(Math.cos(a/64*6.2832)*rad,Math.sin(a/64*6.2832)*rad,0));
-    g.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x2f5d7a})));
-    for(let k=0;k<cnt;k++){
-      const e=new THREE.Mesh(gS,si===sh.length-1?mV:mE);e.scale.setScalar(.2);g.add(e);
-      electrons.push({m:e,rad,ang:k/cnt*6.2832,sp:1.4/Math.sqrt(1+si)});
-    }
-    atom.add(g);
-  });
-  scene.add(atom);
-  camera.position.z=Math.max(11,maxR*2.4);
-  const c=CAT[cat(z)];
-  $("big").textContent=EL[i].s;$("big").style.borderColor=c[1];$("big").style.color=c[1];
-  $("nm").textContent=EL[i].n;
-  $("z").textContent=z;$("a").textContent=m;$("pr").textContent=z;$("ne").textContent=n;$("el").textContent=z;
-  $("sh").textContent=sh.join(", ");$("va").textContent=sh[sh.length-1];$("gr").textContent=c[0];
-  $("bio").textContent="Биологияда: "+bio(z);
-  [...$("pt").children].forEach((b,k)=>b.classList.toggle("on",k===i));
-}
+  for (let i = 0; i < N; i++) {
+    dummy.position.copy(curve.getPointAt(phase[i]));
+    dummy.updateMatrix();
+    chargeMesh.setMatrixAt(i, dummy.matrix);
+  }
+  chargeMesh.instanceMatrix.needsUpdate = true;
 
-// ---------- Мезгилдик таблица ----------
-function pos(z){return z==1?[1,1]:z==2?[1,18]:z<=4?[2,z-2]:z<=10?[2,z+8]:z<=12?[3,z-10]:z<=18?[3,z]:z<=36?[4,z-18]:z<=54?[5,z-36]:z<=56?[6,z-54]:z<=71?[9,z-54]:z<=86?[6,z-68]:z<=88?[7,z-86]:z<=103?[10,z-86]:[7,z-100]}
-EL.forEach((e,i)=>{
-  const b=document.createElement("button"),p=pos(i+1),c=CAT[cat(i+1)][1];
-  b.style.gridRow=p[0];b.style.gridColumn=p[1];b.style.borderColor=c;
-  b.innerHTML="<small>"+(i+1)+"</small><b style='color:"+c+"'>"+e.s+"</b>";
-  b.title=e.n;b.onclick=()=>build(i);$("pt").appendChild(b);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
 });
-$("pv").onclick=()=>build((cur+117)%118);
-$("nx").onclick=()=>build((cur+1)%118);
-$("rd").onclick=()=>build(Math.floor(Math.random()*118));
-addEventListener("keydown",e=>{if($("sim").hidden)return;if(e.key==="ArrowRight")$("nx").click();if(e.key==="ArrowLeft")$("pv").click()});
-
-// ---------- Буруу ----------
-let drag=false,px=0,py=0,ry=0,rx=0;
-canvas.onpointerdown=e=>{drag=true;px=e.clientX;py=e.clientY;canvas.style.cursor="grabbing"};
-addEventListener("pointerup",()=>{drag=false;canvas.style.cursor="grab"});
-addEventListener("pointermove",e=>{if(!drag)return;ry+=(e.clientX-px)*.008;rx+=(e.clientY-py)*.008;px=e.clientX;py=e.clientY});
-canvas.addEventListener("wheel",e=>{e.preventDefault();camera.position.z=Math.min(60,Math.max(5,camera.position.z+e.deltaY*.02))},{passive:false});
-function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
-addEventListener("resize",resize);
-const clock=new THREE.Clock();
-function loop(){
-  const dt=clock.getDelta(),s=+$("spd").value;
-  electrons.forEach(o=>{o.ang+=dt*o.sp*s;o.m.position.set(Math.cos(o.ang)*o.rad,Math.sin(o.ang)*o.rad,0)});
-  if(!drag)ry+=dt*.15*s;
-  atom.rotation.set(rx,ry,0);
-  renderer.render(scene,camera);requestAnimationFrame(loop);
-}
-
-// ---------- Тест ----------
-const POOL=[...Array(36).keys()].map(x=>x+1).concat([47,50,53,79,80,82,92]);
-const BQ=[6,8,9,12,17,20,26,53,11];
-const shuf=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
-const rp=a=>a[Math.floor(Math.random()*a.length)];
-function opts(correct,from){
-  const o=shuf([...new Set(from)].filter(v=>v!==correct)).slice(0,3);
-  return shuf([correct,...o]).map(v=>({t:v,ok:v===correct}));
-}
-function mk(){
-  const t=Math.floor(Math.random()*6);
-  let z=rp(POOL),e=EL[z-1];
-  if(t===0)return{z,q:e.s+" — бул кайсы элемент?",o:opts(e.n,POOL.map(k=>EL[k-1].n))};
-  if(t===1)return{z,q:"«"+e.n+"» элементинин химиялык белгиси кайсы?",o:opts(e.s,POOL.map(k=>EL[k-1].s))};
-  if(t===2){const c=[];for(let d=-5;d<=5;d++)if(d&&z+d>0)c.push(z+d);return{z,q:e.n+" атомунда канча протон бар?",o:opts(z,c)}}
-  if(t===3)return{z,q:e.n+" кайсы топко кирет?",o:opts(CAT[cat(z)][0],CAT.map(c=>c[0]))};
-  if(t===4){z=rp(BQ);e=EL[z-1];return{z,q:"Кайсы элемент: «"+BIO[z]+"»",o:opts(e.n,BQ.map(k=>EL[k-1].n))}}
-  return{z,q:e.n+" атомунда канча электрон кабыгы бар?",o:opts(shells(z).length,[1,2,3,4,5,6,7])};
-}
-let Q=[],qi=0,score=0,bad=[];
-function start(){Q=Array.from({length:10},mk);qi=0;score=0;bad=[];show()}
-function show(){
-  const box=$("qb");
-  if(qi>=Q.length){
-    const msg=score>=9?"Мыкты! Сиз элементтерди абдан жакшы билесиз.":score>=6?"Жакшы! Дагы бир аз кайталасаңыз болот.":"Симуляция бөлүмүндөгү элементтерди кайра карап чыгыңыз.";
-    box.innerHTML="<h2>Жыйынтык: "+score+" / "+Q.length+"</h2><p>"+msg+"</p>"+(bad.length?"<p class='muted'>Ката кеткен элементтер: "+[...new Set(bad)].map(z=>EL[z-1].s+" ("+EL[z-1].n+")").join(", ")+"</p>":"")+"<button class='btn' id='rs'>Кайра баштоо</button>";
-    $("rs").onclick=start;return;
-  }
-  const q=Q[qi];
-  box.innerHTML="<div class='muted'>Суроо "+(qi+1)+" / "+Q.length+" · Упай: "+score+"</div><h2>"+q.q+"</h2><div id='ol'></div><div id='ex'></div>";
-  q.o.forEach(o=>{
-    const b=document.createElement("button");b.className="opt";b.textContent=o.t;
-    b.onclick=()=>{
-      const all=[...$("ol").children];
-      all.forEach((x,k)=>{x.disabled=true;if(q.o[k].ok)x.classList.add("ok")});
-      if(o.ok)score++;else{b.classList.add("bad");bad.push(q.z)}
-      const e=EL[q.z-1];
-      $("ex").innerHTML="<div class='exp'><b>"+(o.ok?"Туура!":"Ката.")+"</b> "+e.s+" — "+e.n+": "+q.z+" протон, "+(e.m-q.z)+" нейтрон, "+q.z+" электрон. "+bio(q.z)+"</div><button class='btn' id='nq'>"+(qi===Q.length-1?"Жыйынтык":"Кийинки суроо")+"</button>";
-      $("nq").onclick=()=>{qi++;show()};
-    };
-    $("ol").appendChild(b);
-  });
-}
-
-// ---------- Табулар ----------
-function tab(n){
-  $("sim").hidden=n!==1;$("quiz").hidden=n!==2;
-  $("t1").classList.toggle("on",n===1);$("t2").classList.toggle("on",n===2);
-  if(n===1)resize();
-}
-$("t1").onclick=()=>tab(1);$("t2").onclick=()=>tab(2);
-build(25);resize();loop();start();
 </script>
 </body>
 </html>
